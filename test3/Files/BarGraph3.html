@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+.bar { fill: green; }
+
+</style>
+<body>
+<center><h1>Student Statistics</h1>
+Name: Srija Adusumilli; E-Mail: srija.adusumilli@utah.edu; UID: u1140248</p></center>
+<form name="f" method="post">
+        <table border="0">
+            <tr><td>Graph</td>
+                <td><select name="graph" onchange="document.getElementById('foobarsubmit').href = this.value;">
+                        <option value="select">Select</option>
+                        <option value="./BarGraph1.html">Gender-Population</option>
+                        <option value="./BarGraph2.html">RaisedHands Vs Class</option>
+                        <option value="#">SchoolSatisfaction Vs Announcements</option>
+                        <option value="./BarGraph4.html">Discussion Vs ParentAnswering</option>
+                        <option value="./LineGraph1.html">AnnouncementView Vs VisitedResources</option>
+                        <option value="./LineGraph2.html">RaisedHands Vs Discussion</option>
+                        <option value="./LineGraph3.html">VisitedResources Vs Discussion</option>
+                        <option value="./LineGraph4.html">RaisedHands Vs VisitedResources,Announcements</option>
+                    </select></td>
+                    <td><a id="foobarsubmit" href="#">Submit</a></td>
+            </tr>
+            <tr><td>Columns Used:</td><td><select name="col">
+            <option value="Show">Show</option>
+            <option value="ParentschoolSatisfaction">ParentschoolSatisfaction on x-Axis</option>
+            <option value="AnnouncementsView">AnnouncementsView on y-Axis</option>
+                    </select></td></tr>
+        </table>
+    </form>
+
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script>
+
+// set the dimensions and margins of the graph
+var margin = {top: 20, right: 20, bottom: 30, left: 40},
+    width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+// set the ranges
+var x = d3.scaleBand()
+          .range([0, width])
+          .padding(0.1);
+var y = d3.scaleLinear()
+          .range([height, 0]);
+          
+// append the svg object to the body of the page
+// append a 'group' element to 'svg'
+// moves the 'group' element to the top left margin
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", 
+          "translate(" + margin.left + "," + margin.top + ")");
+
+// get the data
+d3.csv("Data.csv", function(error, data) {
+  if (error) throw error;
+
+  // format the data
+  data.forEach(function(d) {
+    d.AnnouncementsView = +d.AnnouncementsView;
+  });
+
+  // Scale the range of the data in the domains
+  x.domain(data.map(function(d) { return d.ParentschoolSatisfaction; }));
+  y.domain([0, d3.max(data, function(d) { return d.AnnouncementsView; })]);
+
+  // append the rectangles for the bar chart
+  svg.selectAll(".bar")
+      .data(data)
+    .enter().append("rect")
+      .attr("class", "bar")
+      .attr("x", function(d) { return x(d.ParentschoolSatisfaction); })
+      .attr("width", x.bandwidth())
+      .attr("y", function(d) { return y(d.AnnouncementsView); })
+      .attr("height", function(d) { return height - y(d.AnnouncementsView); });
+
+  // add the x Axis
+  svg.append("g")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(x));
+
+  // add the y Axis
+  svg.append("g")
+      .call(d3.axisLeft(y));
+
+});
+
+</script>
+</body>

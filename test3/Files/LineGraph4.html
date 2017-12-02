@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+
+
+path { 
+	stroke: green;
+	stroke-width: 2;
+	fill: none;
+}
+
+.axis path,
+.axis line {
+	fill: none;
+	stroke: grey;
+	stroke-width: 1;
+	shape-rendering: crispEdges;
+}
+
+</style>
+<body>
+    <center><h1>Student Statistics</h1>Name: Srija Adusumilli; E-Mail: srija.adusumilli@utah.edu; UID: u1140248</p></center>
+    <form name="f" method="post">
+        <table border="0">
+            <tr><td>Graph</td>
+                <td><select name="graph" onchange="document.getElementById('foobarsubmit').href = this.value;">
+                        <option value="select">Select</option>
+                        <option value="./BarGraph1.html">Gender-Population</option>
+                        <option value="./BarGraph2.html">RaisedHands Vs Class</option>
+                        <option value="./BarGraph3.html">SchoolSatisfaction Vs Announcements</option>
+                        <option value="./BarGraph4.html">Discussion Vs ParentAnswering</option>
+                        <option value="./LineGraph1.html">AnnouncementView Vs VisitedResources</option>
+                        <option value="./LineGraph2.html">RaisedHands Vs Discussion</option>
+                        <option value="./LineGraph3.html">VisitedResources Vs Discussion</option>
+                        <option value="#">RaisedHands Vs VisitedResources,Announcements</option>
+                    </select></td>
+                    <td><a id="foobarsubmit" href="#">Submit</a></td>
+            </tr>
+            <tr><td>Columns Used:</td><td><select name="col">
+            <option value="Show">Show</option>
+            <option value="AnnouncementsView and VisitedResources">AnnouncementsView,VisitedResources on x-axis</option>
+            <option value="RaisedHands">RaisedHands on y-axis</option>            
+                    </select></td></tr>
+        </table>
+    </form>    
+<script src="http://d3js.org/d3.v3.min.js"></script>
+
+<script>
+
+var	margin = {top: 30, right: 40, bottom: 30, left: 50},
+	width = 600 - margin.left - margin.right,
+	height = 270 - margin.top - margin.bottom;
+
+var	x = d3.time.scale().range([0, width]);
+var	y = d3.scale.linear().range([height, 0]);
+
+var	xAxis = d3.svg.axis().scale(x)
+	.orient("bottom").ticks(5);
+
+var	yAxis = d3.svg.axis().scale(y)
+	.orient("left").ticks(5);
+
+var	valueline = d3.svg.line()
+	.x(function(d) { return x(d.raisedhands); })
+	.y(function(d) { return y(d.VisITedResources); });
+	
+var	valueline2 = d3.svg.line()
+	.x(function(d) { return x(d.raisedhands); })
+	.y(function(d) { return y(d.AnnouncementsView); });
+  
+var	svg = d3.select("body")
+	.append("svg")
+		.attr("width", width + margin.left + margin.right)
+		.attr("height", height + margin.top + margin.bottom)
+	.append("g")
+		.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+// Get the data
+d3.csv("Data.csv", function(error, data) {
+	data.forEach(function(d) {
+		d.raisedhands = d.raisedhands;
+		d.VisITedResources = +d.VisITedResources;
+		d.AnnouncementsView = +d.AnnouncementsView;
+	});
+
+	// Scale the range of the data
+	x.domain(d3.extent(data, function(d) { return d.raisedhands; }));
+	y.domain([0, d3.max(data, function(d) { return Math.max(d.VisITedResources, d.AnnouncementsView); })]);
+
+	svg.append("path")		// Add the valueline path.
+		.attr("class", "line")
+		.attr("d", valueline(data));
+
+	svg.append("path")		// Add the valueline2 path.
+		.attr("class", "line")
+		.style("stroke", "yellow")
+		.attr("d", valueline2(data));
+
+	svg.append("g")			// Add the X Axis
+		.attr("class", "x axis")
+		.attr("transform", "translate(0," + height + ")")
+		.call(xAxis);
+
+	svg.append("g")			// Add the Y Axis
+		.attr("class", "y axis")
+		.call(yAxis);
+
+	svg.append("text")
+		.attr("transform", "translate(" + (width+3) + "," + y(data[0].AnnouncementsView) + ")")
+		.attr("dy", ".35em")
+		.attr("text-anchor", "start")
+		.style("fill", "yelow")
+		.text("AnnView");
+
+	svg.append("text")
+		.attr("transform", "translate(" + (width+3) + "," + y(data[0].VisITedResources) + ")")
+		.attr("dy", ".35em")
+		.attr("text-anchor", "start")
+		.style("fill", "green")
+		.text("VisRes");
+
+console.log(data.length-1);
+console.log(data[data.length-1].AnnouncementsView);
+console.log(data[0].AnnouncementsView);
+console.log(y(data[0].AnnouncementsView));
+console.log(y(data[0].VisITedResources));
+
+});
+
+</script>
+</body>
